@@ -20,7 +20,7 @@ const API_SCOPE = "api://74bc9842-c074-43d7-9474-94800b274287/Login"; // Scope d
 // Backend URL según el entorno
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (isLocal 
   ? "http://localhost:8080" 
-  : "https://wheelsu-backend.azurewebsites.net");
+  : "https://wheelsu-backend-fnbxbyatbrehbfbs.brazilsouth-01.azurewebsites.net");
 
 console.log('🚗 WheelsU - Entorno detectado:', isLocal ? 'LOCAL' : 'PRODUCCIÓN');
 console.log('🔗 Redirect URI:', REDIRECT_URI);
