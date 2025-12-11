@@ -4,6 +4,7 @@ import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
 import { encryptMessage, decryptMessage, generateKeyPair, saveKeyPair, loadKeyPair, exportPublicKey } from '../services/encryption';
 import { chatAPI } from '../services/api';
+import { API_BASE_URL } from '../authConfig';
 import '../styles/Chat.css';
 
 const Chat = ({ currentUser, onClose }) => {
@@ -45,7 +46,6 @@ const Chat = ({ currentUser, onClose }) => {
   useEffect(() => {
     if (!keyPair) return;
 
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
     const socket = new SockJS(`${API_BASE_URL}/ws`);
     const client = over(socket);
     

@@ -1,23 +1,9 @@
 // src/services/api.js
 import axios from 'axios';
+import { API_BASE_URL } from '../authConfig';
 
 // URL base del backend - cambiar según el entorno
-export const getApiBaseUrl = (env = import.meta.env, location = window.location) => {
-  // Primero intentar con la variable de entorno de Vite
-  if (env?.VITE_API_URL) {
-    return env.VITE_API_URL;
-  }
-  
-  // Si estamos en producción
-  if (location?.hostname?.includes('cloudfront.net')) {
-    return 'https://d34hoxniq2n0jw.cloudfront.net';
-  }
-  
-  // Por defecto, usar localhost para desarrollo
-  return 'http://localhost:8080';
-};
-
-const API_BASE_URL = getApiBaseUrl();
+export const getApiBaseUrl = () => API_BASE_URL;
 
 // Log para debugging (solo en desarrollo)
 if (import.meta.env.DEV) {

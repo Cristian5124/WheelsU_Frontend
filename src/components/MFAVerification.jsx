@@ -1,6 +1,7 @@
 // src/components/MFAVerification.jsx
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useMsal } from '@azure/msal-react';
+import { API_BASE_URL } from '../authConfig';
 import '../styles/MFAVerification.css';
 
 const MFAVerification = ({ onVerified }) => {
@@ -62,7 +63,7 @@ const MFAVerification = ({ onVerified }) => {
     setSuccess('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/mfa/send', {
+      const response = await fetch(`${API_BASE_URL}/api/mfa/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -116,7 +117,7 @@ const MFAVerification = ({ onVerified }) => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/mfa/verify', {
+      const response = await fetch(`${API_BASE_URL}/api/mfa/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
