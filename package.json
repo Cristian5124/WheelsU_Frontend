@@ -1,0 +1,44 @@
+{
+  "name": "flight-viz2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest --config vitest.config.mjs",
+    "test:ui": "vitest --config vitest.config.mjs --ui",
+    "test:coverage": "vitest run --config vitest.config.mjs --coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/msal-browser": "^4.25.1",
+    "@azure/msal-react": "^3.0.20",
+    "@stomp/stompjs": "^7.2.1",
+    "@turf/turf": "^7.2.0",
+    "axios": "^1.12.2",
+    "globe.gl": "^2.44.1",
+    "leaflet": "^1.9.4",
+    "maplibre-gl": "^5.9.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.6",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@vitejs/plugin-react": "^5.0.4",
+    "@vitest/coverage-v8": "^4.0.15",
+    "@vitest/ui": "^4.0.15",
+    "jsdom": "^25.0.1",
+    "vite": "^7.2.6",
+    "vitest": "^4.0.15"
+  }
+}
