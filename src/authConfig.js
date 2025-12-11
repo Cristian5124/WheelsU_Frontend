@@ -11,20 +11,16 @@ const TENANT_ID = "50640584-2a40-4216-a84b-9b3ee0f3f6cf";    // WheelsU Tenant I
 const AUTHORITY = `https://login.microsoftonline.com/${TENANT_ID}`;
 
 // URLs dinámicas según el entorno
-const REDIRECT_URI = isLocal 
-  ? "http://localhost:5173/" 
-  : "https://d34hoxniq2n0jw.cloudfront.net/";
+const REDIRECT_URI = window.location.origin + "/";
 
-const POST_LOGOUT_REDIRECT_URI = isLocal 
-  ? "http://localhost:5173/" 
-  : "https://d34hoxniq2n0jw.cloudfront.net/";
+const POST_LOGOUT_REDIRECT_URI = window.location.origin + "/";
 
 const API_SCOPE = "api://74bc9842-c074-43d7-9474-94800b274287/Login"; // Scope de WheelsU
 
 // Backend URL según el entorno
-const API_BASE_URL = isLocal 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (isLocal 
   ? "http://localhost:8080" 
-  : "https://d34hoxniq2n0jw.cloudfront.net";
+  : "https://wheelsu-backend.azurewebsites.net");
 
 console.log('🚗 WheelsU - Entorno detectado:', isLocal ? 'LOCAL' : 'PRODUCCIÓN');
 console.log('🔗 Redirect URI:', REDIRECT_URI);

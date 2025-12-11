@@ -2,10 +2,6 @@
   "name": "flight-viz2",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
-  "engines": {
-    "node": ">=22.0.0"
-  },
   "main": "index.js",
   "scripts": {
     "dev": "vite",
