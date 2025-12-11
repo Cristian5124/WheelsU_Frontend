@@ -94,6 +94,12 @@ export const chatAPI = {
   
   // Marcar mensaje como leído
   markAsRead: (messageId) => api.post(`/api/chat/read/${messageId}`),
+
+  // Registrar clave pública
+  registerPublicKey: (userId, publicKey) => api.post('/api/chat/key', { userId, publicKey }),
+
+  // Obtener clave pública
+  getPublicKey: (userId) => api.get(`/api/chat/key/${encodeURIComponent(userId)}`),
 };
 
 export default api;

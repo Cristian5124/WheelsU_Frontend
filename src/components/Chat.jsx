@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
-import { encryptMessage, decryptMessage, generateKeyPair, saveKeyPair, loadKeyPair, exportPublicKey } from '../services/encryption';
+import { encryptMessage, decryptMessage, generateKeyPair, saveKeyPair, loadKeyPair, exportPublicKey, importPublicKey } from '../services/encryption';
 import { chatAPI } from '../services/api';
 import { API_BASE_URL } from '../authConfig';
 import '../styles/Chat.css';
@@ -34,13 +34,21 @@ const Chat = ({ currentUser, onClose }) => {
           console.log('✅ Claves cargadas desde localStorage');
         }
         setKeyPair(keys);
+
+        // Registrar clave pública en el servidor
+        const publicJwk = await exportPublicKey(keys.publicKey);
+        await chatAPI.registerPublicKey(currentUser, JSON.stringify(publicJwk));
+        console.log('✅ Clave pública registrada en el servidor');
+
       } catch (error) {
         console.error('Error inicializando claves:', error);
       }
     };
 
-    initKeys();
-  }, []);
+    if (currentUser) {
+      initKeys();
+    }
+  }, [currentUser]);
 
   // Conectar al WebSocket
   useEffect(() => {
@@ -133,7 +141,26 @@ const Chat = ({ currentUser, onClose }) => {
           response.data.messages.map(async (msg, index) => {
             try {
               console.log(`🔓 Desencriptando mensaje ${index + 1}/${response.data.messages.length}`);
-              const decrypted = await decryptMessage(msg.encryptedContent, keyPair.privateKey);
+              
+              let contentToDecrypt;
+              
+              // Si yo lo envié, uso la copia encriptada para mí
+              if (msg.senderId === currentUser) {
+                  if (msg.encryptedContentSender) {
+                      contentToDecrypt = msg.encryptedContentSender;
+                  } else {
+                      // Mensajes antiguos que no tienen copia para el remitente
+                      return {
+                          ...msg,
+                          decryptedContent: '[Mensaje antiguo no disponible]',
+                      };
+                  }
+              } else {
+                  // Si me lo enviaron, uso el contenido normal
+                  contentToDecrypt = msg.encryptedContent;
+              }
+
+              const decrypted = await decryptMessage(contentToDecrypt, keyPair.privateKey);
               console.log(`✅ Mensaje ${index + 1} desencriptado:`, decrypted.substring(0, 50) + '...');
               return {
                 ...msg,
@@ -193,17 +220,35 @@ const Chat = ({ currentUser, onClose }) => {
     }
 
     try {
-      // TODO: En una implementación real, deberíamos obtener la clave pública del receptor
-      // Por ahora, usamos nuestra propia clave pública para desarrollo
-      const recipientPublicKey = keyPair.publicKey;
+      // Obtener la clave pública del receptor
+      let recipientPublicKey;
+      try {
+        const response = await chatAPI.getPublicKey(selectedContact);
+        if (response.data.success && response.data.publicKey) {
+          const publicJwk = JSON.parse(response.data.publicKey);
+          recipientPublicKey = await importPublicKey(publicJwk);
+          console.log('🔑 Clave pública del receptor obtenida');
+        }
+      } catch (error) {
+        console.warn('⚠️ No se pudo obtener la clave del receptor, usando clave propia (fallback inseguro)');
+      }
 
-      // Encriptar el mensaje
-      const encrypted = await encryptMessage(newMessage, recipientPublicKey);
+      // Si no se pudo obtener, usar la propia (para desarrollo/fallback)
+      if (!recipientPublicKey) {
+         recipientPublicKey = keyPair.publicKey;
+      }
+
+      // Encriptar el mensaje para el RECEPTOR
+      const encryptedForReceiver = await encryptMessage(newMessage, recipientPublicKey);
+
+      // Encriptar el mensaje para MÍ MISMO (para poder leerlo en el historial)
+      const encryptedForSender = await encryptMessage(newMessage, keyPair.publicKey);
 
       const chatMessage = {
         senderId: currentUser,
         receiverId: selectedContact,
-        encryptedContent: encrypted,
+        encryptedContent: encryptedForReceiver,
+        encryptedContentSender: encryptedForSender,
         timestamp: new Date().toISOString(),
         status: 'SENT',
       };
@@ -361,6 +406,7 @@ const Chat = ({ currentUser, onClose }) => {
                             {new Date(msg.timestamp).toLocaleTimeString('es-CO', {
                               hour: '2-digit',
                               minute: '2-digit',
+                              timeZone: 'America/Bogota' // Forzar zona horaria de Colombia (GMT-5)
                             })}
                           </div>
                         </div>
